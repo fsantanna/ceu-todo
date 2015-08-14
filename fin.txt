@@ -1,0 +1,556 @@
+Se uma atribuicao a um ponteiro é aceita:
+p1 := xxx   (qualquer atribuição não segura)
+p1 = p2     (sendo que escopo de p1 <= p2)*
+p1 = &v     (sendo que escopo de p1 <= v)
+Então, o compilador assume que o objeto apontado vai durar pelo menos o mesmo 
+tempo (escopo) que o pointeiro.
+E isso se propagará indefinidamente:
+p0 = p1     (sendo que escopo de p0 <= p1)*
+* mesma hipótese (indutiva)
+
+Casos base:
+p = &v      (onde escopo de p <= v)
+p := xxx
+
+----
+
+Ou então: (esquece tudo acima!)
+var tp[] ptr := xxx (primeira attr)
+         ptr = xxx  (erro p/ todas as outras attrs)
+Em vez de [], usar & e tudo fica mágico!!!
+depois, todos os usos de ptr assumem que o dado tem o mesmo escopo de ptr
+
+Os ponteiros normais continuam com a regra de *nunca* cruzar awaits
+
+---
+
+Poneiros para organismos sempre podem ser atribuidos, pois todos os acessos 
+utilizam watching
+
+---
+
+Sonho:
+acessos a ponteiros tem que testar null
+acessos a [] nao precisam
+
+---
+
+Remover @hold da linguagem?
+Métodos que podem guardar ponteiros passados como "hold" parameters ferem a 
+lógica de qualquer atribuicao de ponteiros ser invalida.
+No entanto, pode ser útil quando o org é usado como um recurso, ja que a 
+chamada obriga ao chamador a usar um finalizador.
+- estou inclinado a recusar isso!
+    - preciso de um exemplo em que passar por referencia na é suficiente
+
+---
+
+Proibir acessos a ponteiros de interfaces que não sejam exclusivamente pelo 
+construtor?
+- evita problemas com acesso T/I* ao mesmo campo
+
+---
+
+Assume que ponteiros nativos apontam para objetos globais
+nao dando erro "across await"
+
+---
+
+Colocar/juntar com doc no fim de fin.lua
+
+---
+
+Atribuicao de endereco de buffer e/ou ponteiro de escopo menor p/ maior
+pode dar problema mesmo em sequencias sem await:
+    var int* u;
+    do
+        var int[1] i;
+        i[0] = 2;
+        u = i;
+    end
+    do
+        var int[1] i;
+        i[0] = 5;
+    end
+    escape *u;
+
+
+===============================================================================
+
+-- TODO: join all unsafe pointer attribution, they are always unsafe
+                ASR(op==':=', me, 'attribution to pointer with greater scope')
+                    -- function (void* v)=>void f do
+                    --    _V = v;       -- _V is global
+                    -- end
+                    --
+                    -- function (void)=>void f do
+                    --     var void* v;
+                    --     this.a = v;  -- a is top level
+                    -- end
+                    --
+                    -- function (void* v)=>void f do
+                    --     this.a = v;  -- a is top level
+                    -- end
+
+[ERR 3] ???
+
+-------------------------------------------------------------------------------
+
+-- V é global, v nao eh definido
+ERR : tests.lua : line 5 : unsafe pointer attribution
+
+native do
+    void* V;
+end
+function (void* v)=>void f do
+    _V = v;
+end
+escape 1;
+
+-------------------------------------------------------------------------------
+
+-- a é top-level, v eh local
+ERR : tests.lua : line 7 : unsafe pointer attribution
+
+class T with
+    var void* a;
+    function (void)=>void f;
+do
+    function (void)=>void f do
+        var void* v;
+        a = v;
+    end
+end
+escape 1;
+
+-------------------------------------------------------------------------------
+
+-- a é top-level, v eh indefinido
+ERR : tests.lua : line 6 : unsafe pointer attribution
+
+class T with
+    var void* a;
+    function (void* v)=>void f;
+do
+    function (void* v)=>void f do
+        a = v;
+    end
+end
+escape 1;
+
+-------------------------------------------------------------------------------
+
+===============================================================================
+
+ERR 4: ???
+
+-------------------------------------------------------------------------------
+
+-- a funcao esta segurando um ponteiro de um escopo indefinido para o top-level
+-- (o parametro precisa de hold e a chamada precisa de finalize)
+ERR : tests.lua : line 6 : parameter must be `hold´
+
+class T with
+    var void* a;
+    function (void* v)=>void f;
+do
+    function (void* v)=>void f do
+        a := v;
+    end
+end
+escape 1;
+
+-------------------------------------------------------------------------------
+
+-- V eh global, v eh desconhecido
+ERR : tests.lua : line 5 : parameter must be `hold´
+
+native do
+    void* V;
+end
+function (void* v)=>void f do
+    _V := v;
+end
+var void* x;
+f((void*)5);
+escape _V==(void*)5;
+
+-------------------------------------------------------------------------------
+
+===============================================================================
+
+ERR 6: attribution requires `finalize´
+
+-- TODO: obrigar []/:= para as atribuicoes?
+
+-------------------------------------------------------------------------------
+
+-- ptr requer finalizacao
+ERR : tests.lua : line 4 : attribution requires `finalize´
+
+native do
+    void* ptr;
+end
+_ptr = _malloc(1);
+escape 1;
+
+-------------------------------------------------------------------------------
+
+===============================================================================
+
+ERR 8: unsafe pointer attribution
+
+TODO: mudar mensagem? deixar claro que estou cruzando p/ um outro org?
+        ou escopo maior?
+        2 erros diferentes?
+
+-------------------------------------------------------------------------------
+
+-- atribuo um ponteiro a um campo de um org (que supostamente pode ser acessado 
+across await)
+ERR : tests.lua : line 9 : unsafe pointer attribution
+
+class T with
+    var void* v;
+do
+end
+
+var T t;
+t.v = null;
+var void* ptr = null;
+t.v = ptr;
+escape 1;
+
+-------------------------------------------------------------------------------
+
+-- global:a eh ponteiro com maior escopo que b
+ERR : tests.lua : line 7 : unsafe pointer attribution
+
+interface Global with
+    var int* a;
+end
+class T with
+do
+    var int* b;
+    global:a = b;
+end
+var int* a;
+escape 1;
+
+
+-------------------------------------------------------------------------------
+
+===============================================================================
+
+ERR 12: attribution requires `finalize´
+
+TODO: pq scope x > y?
+
+-------------------------------------------------------------------------------
+
+-- escopo de v > i, precisa finalizacao para qd i sai de escopo
+-- TODO: como v é [], essa atribuicao deveria ser invalida (pois sabemos que v 
+nao tera a memoria para sempre como o [] sugere)
+ERR : tests.lua : line 4 : attribution requires `finalize´
+
+var int[] v;
+do
+    var int i = 1;
+    v = &i;
+end
+escape *v;
+
+
+
+-------------------------------------------------------------------------------
+
+===============================================================================
+
+ERR 13: invalid access to pointer across `await´
+
+-------------------------------------------------------------------------------
+
+-- _V pode ser um ponteiro, e ai nao sei se eh valido across await
+ERR : tests.lua : line 7 : invalid access to pointer across `await´
+
+native do
+    void* V;
+end
+var void* v;
+_V = v;
+await 1s;
+escape _V;
+
+-------------------------------------------------------------------------------
+
+===============================================================================
+
+ERR 14: invalid access to pointer across `await´
+
+-------------------------------------------------------------------------------
+
+-- "a" cannot be read across the "await"
+ERR : tests.lua : line 5 : invalid access to pointer across `await´
+
+var int* a;
+var int* b = null;
+a = b;
+await 1s;
+var int* c = a;
+escape 1;
+
+-------------------------------------------------------------------------------
+
+-- "v" cannot be read across the "await"
+ERR : tests.lua : line 11 : invalid access to pointer across `await´
+
+native do
+    void f (int* a) {
+        *a = 10;
+    }
+    typedef void (*t)(int*);
+end
+native _t = 4;
+var _t v = _f;
+await 1s;
+var int a;
+v(&a) finalize with nothing; end;
+escape(a);
+
+-------------------------------------------------------------------------------
+
+-- a pointer comes from an "await", after the next "await" we don't know if it 
+-- is still valid.
+ERR : tests.lua : line 4 : invalid access to pointer across `await´
+
+event int* e;
+var int* v = await e;
+await e;
+escape *v;
+
+-------------------------------------------------------------------------------
+
+-- "p" comes from an "await", "p1=p", "p1" is accessed across await
+--  we don't know if it is still valid.
+ERR : tests.lua : line 8 : invalid access to pointer across `await´
+
+var int* p1;
+do
+    var int* p;
+    event int* e;
+    p = await e;
+    p1 = p;
+    await e;
+    escape *p1;
+end
+escape 1;
+
+-------------------------------------------------------------------------------
+
+-- o par/and faz o acesso da linha 8 ser across "await"
+ERR : tests.lua : line 8 : invalid access to pointer across `await´
+
+var int* p;
+par/and do
+    await 1s;
+with
+    event int* e;
+    p = await e;
+end
+escape *p;
+
+-------------------------------------------------------------------------------
+
+-- dificil detectar que o par/or termina e por isso o *p eh na mesma reacao
+ERR : tests.lua : line 12 : invalid access to pointer across `await´
+
+var int* p;
+var int i;
+input void OS_START;
+do
+    event (int,int*) ptr;
+    par/or do
+        (i,p) = await ptr;
+    with
+        await OS_START;
+        emit ptr => (1, null);
+    end
+    i = *p;
+end
+escape i;
+
+-------------------------------------------------------------------------------
+
+-- *p dentro da class cruza await (sendo que p vem pelo construtor)
+ERR : tests.lua : line 8 : unsafe pointer attribution
+
+var int i = 1;
+var int[] v = &i;
+
+class T with
+    var int*  p = null;
+    var int[] v = null;
+do
+    await 1s;
+    *v = 1;
+    *p = 1;
+end
+
+var T t with
+    this.p := v;
+    this.v = v;
+end;
+
+escape *(t.p) + *(t.v);
+
+-------------------------------------------------------------------------------
+
+===============================================================================
+
+ERR 15: finalizador dentro de construtor, so vazio
+
+-------------------------------------------------------------------------------
+
+ERR : tests.lua : line 21 : only empty finalizers inside constructors
+
+native _s=0;
+native do
+    typedef int s;
+end
+
+class T with
+    var _s* ptr = null;
+do
+end
+
+native do ##include <assert.h> end
+native _V, _assert();
+native do
+    int V=0;
+end
+
+do
+    loop i in 10 do
+        var _s* p = null;
+        spawn T with
+            finalize
+                this.ptr = p;
+            with
+                _V = _V + 1;
+            end
+        end;
+        await 1s;
+    end
+    _assert(_V == 10);
+end
+
+escape _V;
+
+-------------------------------------------------------------------------------
+
+===============================================================================
+
+ERR 16: call to "_f" requires `finalize´
+
+TODO: mudar mensagem de erro
+given arguments require `finalize´
+
+-------------------------------------------------------------------------------
+
+-- p1 and p2 point to something that _f holds, what happens when p1/p2 go out 
+--  of scope?
+-- TODO: estou assumindo que o que p1/p2 apontam tem o mesmo escopo dos ponteiros
+    -- pois é, acho que não posso passar ponteiros * para fcs, apenas [] ou &
+ERR : tests.lua : line 6 : call to "_f" requires `finalize´
+
+native _f();
+do
+    var int* p1 = null;
+    do
+        var int* p2 = null;
+        _f(p1, p2);
+    end
+end
+escape 1;
+
+-------------------------------------------------------------------------------
+
+-- &v points to v, what happens when v goes out of scope?
+ERR : tests.lua : line 8 : call to "_f" requires `finalize´
+
+native _f();
+native do
+    int f (int* v) {
+        return 1;
+    }
+end
+var int v;
+escape _f(&v) == 1;
+
+-------------------------------------------------------------------------------
+
+[ERR 16] ???
+==============
+class T with
+    var void* v;
+    function (@hold void* v)=>void f;
+do
+    function (@hold void* v)=>void f do
+        this.v := v;
+    end
+end
+var void* v;
+var T t;
+t.f(null);
+t.f(v);
+do
+    var void* v;
+    t.f(v);
+end
+escape 1;
+
+---
+stack traceback:
+	./run_tests.lua:41: in function 'Test'
+	tests.lua:31846: in main chunk
+	[C]: in function 'dofile'
+	./run_tests.lua:274: in main chunk
+	[C]: ?
+---
+lines.lua:122: ERR : tests.lua : line 12 : call to "f" requires `finalize´
+================
+
+-------------------------------------------------------------------------------
+
+===============================================================================
+
+ERR 17: finalize what? no parameters need finalization
+
+TODO: mudar mensagem de erro
+given arguments do not need `finalize'
+
+-------------------------------------------------------------------------------
+
+-- "f" receives no parameters, when should the "finalize" run?
+ERR : tests.lua : line 2 : invalid `finalize´
+
+native _f();
+_f() finalize with nothing;
+    end;
+escape 1;
+
+-------------------------------------------------------------------------------
+
+-- "f" receives a "int", when should the "finalize" run?
+ERR : tests.lua : line 5 : invalid `finalize´
+
+native _f();
+native do void f () {} end
+
+var void* p = null;
+_f(p!=null) finalize with nothing;
+    end;
+escape 1;
+
+-------------------------------------------------------------------------------
+

@@ -1,0 +1,337 @@
+- New scheduler
+    - guardar time do original
+    + checar se Rocks,Tic-Tac,UI*,Curry-All,STL-All,Turtle estao OK
+    - proibir emit=>ptr&&, permitir emit=>org&&?
+        - acho que tem que proibir ambos
+    - checar se Rocks,Tic-Tac,UI*,Curry-All,STL-All,Turtle usam emit=>ptr&&
+    - two-pass scheduler
+        - resolve RESEARCH-2
+        - elimina IDs de orgs, se ok_killed já testar o ponteiro no momento da 
+          1a passada
+    - rodar time do novo scheduler
+    - checar se Rocks,Tic-Tac,UI*,Curry-All,STL-All,Turtle usam emit=>ptr&&
+
+- ok_kill ser especial e carregar na trail o org/adt a ser testado
+    - 1 passada para marcar como acrodado, outra para então executar
+    - isso não pode ser aplicado de maneira geral?
+    - não vai solucionar outros problemas?
+    - voltar com aquela ideia de duas passadas para geral...
+
+- make free after kill
+    /* TODO: BUG: id should be saved together with the pointer */
+
+- Field => Var
+- make unsafe casts a warning/error
+- unify ref/fin
+    - fazer first assignment check para todos as variaveis
+        - menos T, pool, adt
+- refuse pointer to orgs
+    - only accept option pointers
+    - not yet, lets see if they are still useful
+- NIL if !isAlive
+- awake when !isAlive
+    - set to NIL
+- fix pool iter to use *? instead of all that complexity
+
+- add vector opt
+- create ops branch
+    - rval, lval, is_lval
+    - add explicit &&
+    - refactor val.lua
+    - join fin/ref.lua
+
+- ADT out-of-memory p/ new com mais de um elemento
+- ADT: sub of sub
+- out-of-memory para traverse body allocation fail!
+
+- v0.10, DOC
+
+- BUG: isParent/clr_stack
+
+- TRAVERSE: C pointers
+
+- ADTS: watch across 'adt-mut'
+
+- PINGUS
+    - compilar p/ nova versao
+
+- TURTLE:
+    - example with stream
+
+- broadcast
+    - tentar eliminar todos os clear/etc/innedificiencies
+
+- await de organismo estatico é o único que pode acordar
+    imadiatamente e quebra a deteccao de tight loops
+    dar erro de runtime caso !isAlive
+
+- REFACTOR
+    - node_BS
+    - remover tests de org->isAlive e org->ret
+    - bug: master body mover p/ dentro do pool para ordem de finalize ser 
+      satisfeita
+    - ADT constructors, static,dynamic,recursive need refactor
+    - Type: pilha de modificadores
+        - incluir pool/var/event/I/O
+    - val.lua
+
+- BUGS:
+    - TM falha com valgrind (verificar se sempre foi assim)
+    - async dentro de every
+    - fopen/malloc reatribuido
+        - tratar do mesmo jeito que referencias
+            - (talvez ja esteja assim, ja que agora os ptrs viraram refs)
+    - ADT: master body mover p/ dentro do pool para ordem de finalize ser 
+      satisfeita
+    - ADT tambem deveria ser identificado por inteiro, ja que pode ser recriado 
+      com mesmo ponteiro sendo destruido
+
+- option type para spawn:
+    data OPT-T with
+        tag FAIL;
+    or
+        tag T* ptr;
+    or
+        tag int result;
+    end
+
+- error message "across emit/await" (vs somente "across await")
+
+- await-ORG, await-ADT e recurse são await/0
+    - proibir emit-o sem watching
+    - proibir kill dentro de finalize
+
+- COOL PROJECTS
+    - use emscripten to run ceu-sdl/samples on the Web
+    - re-implement 7 guis (requires a C-based toolkit: IUP/GTK)
+    - Logo/Ceu interpreter
+    - GUI tree
+    - OS permissions for I/O and syscalls
+    - pool de threads async/thread (a,b,c) in XXX;
+    - gerador de programas para pegar bugs no compilador
+    - Debugger
+    - Visual editor
+    - OS
+    - Handmade Hero
+
+- INEFFICIENCIES
+    - related to "kill"
+        - ids for orgs (vs pointers)
+        - pool traversal for killed "nxt" orgs
+        - ceu_stack_clear_org clears stack for dieing organisms
+            - and needs to go up in the nested org hierarchy
+    - internal emit finalization + ceu_sys_clear
+        - Emit não mais passar ptrs q escapam o escopo do await, assim tudo 
+          pode virar refs.
+        - Tb elimina o finalie em volta de cada emite.
+    - seqno vs double pass
+        - double pass ceu_sys_go: EXTERNAL=>STK + execution
+- THINGS THAT CAN BRAKE THE LANGUAGE
+    --[[
+    -- Trying to create an infinite loop with
+    -- bounded pool + recursive spawn.
+    -- Is it possible?
+    --]]
+
+- analogia visao/audicao
+    - look vs request
+        - look tb leva tempo mas é rápido demais p/ o cerebro distinguir
+            - modelo sincrono, entre o inicio/fim da operacao visao,
+                o cerebro esta 100% focado nisso
+            - a fronteira é continua, qd o objeto vai ficando distante
+                pode ser que não seja mais zero-delay
+            - ajuste de foco já não é zero-delay
+
+- REFACTORING
+    - nao usar Tuplas/VarList qd "a=await X"
+    - remover tup_*
+    - error codes
+    - remover ceu_types.h
+    - remove ifdef CEUDEBUG do sys_assert
+    - tceu_stk ser minimo e evt_sz determinar tamanho da struct+payload
+    - ADT recursive constructors ficaram mais simples
+
+- Debug
+    - Stack maxima em itens e mem
+    - Perc max em itens para clear org
+    - Print no fim de cada exec
+    - Capturar no stats final
+
+- não posso ter ointers para instance variables!!
+    - isso quebra os orgs que terminam automaticamente
+
+- exemplos com option types dentro de interfaces:
+    if org1.org2.v? then ... end
+    - immutable
+    var int v;  // warning if used as val
+    val int v;  // error if used as var
+
+- ponteiros não podem ser reatribuidos
+- valores tem que ser inicializados (ou decalarados com ?)
+
+- adt capturado como "old" em (old=await old)
+    - eh um ponteiro que vai ser coletado em seguida
+        - pois o kill esta em processo e sua continuacao da o free
+    - em hipotese alguma esse "old" pode ser acessado across await
+        - nem mesmo com "watching"
+
+- NEW VERSION
+    - Arduino
+        - timemachine (all possible combinations)
+    - TinyOS
+        - samples
+
+- await until primitivo?
+    - re-setar seqno?
+
+- ADTs
+    - pool compartilhado por pais e filhos, pai tem que matar filho
+    - watching p/ data
+    -  - verificar deteccao de across
+    - nested anonymous class
+    - TODO-ADT-REC-STATIC-CONSTRS: construtores recursivos que recebem
+        endereco do campo declarado estaticamente. Estou recusando agora,
+        mas já foi permitido
+
+    - 
+    - loop iterator
+    - dynamic / watching
+    - arrays
+    - hashs
+    - exemplos
+        - parser
+        - logo turtle
+        - UI hierarchy
+- ADTS
+    - colocar de volta recurse/C que ja estao nos testes (comentados)
+    - testar tb watching c/ adt estatico
+    - bounded iters
+    - loop dentro de loop
+        - loop/nrm, loop/adt p/ outro dado mas mesmo tipo
+
+- pool the threads
+    pool thread[4] ts;
+    async/thread (x,y) in ts do
+    end
+
+- eliminar TOP_POOL
+- eliminar :=
+- opcao: --safety I-promess-I-will-not-release-code-with-this-option
+
+- TM:
+    - PAUSE/RESUME
+        - force handling
+    - avaliar tamanho correto de diffs 8/16/32 bits
+    - gerar 10min deterministicos de maneira a
+        1. verificar o funcionamento fino de cada algoritmo
+        2. verificar que os algoritmos se comportam igualmente
+        3. compará-los de maneira uniforme
+    - medidas de tempo e memória
+        - usar mesma memória para todos os algoritmos e mostrar
+            - FPS
+            - Uso de memória
+    - "go_seek" ser chamada síncrona
+        - acho que não dá com TM_QUEUE
+            - a TM precisa executar o código passo a passo
+
+===
+
+- checar se "interface" dentro do sistema de refs ainda é usado
+    acho que só era usado para field=nil
+============
+
+- RPI:
+    - input calls from the app itself
+    - ajeitar todos os finalize comentados
+    - remover calls unsafe
+    - memset com delay (em fat)
+    - rever e-mail com pendencias
+- pre como plavra reservada (tb no vim)
+- fix/understand timemachine
+- grep EVTP, tceu_evtp
+- remover ast_fr
+- no more "invalid event type" (external?)
+- move global event declarations to adj.lua
+- (val.lua) EmitExt baguncado, EmitT como um if acima de tudo forcado
+- bad hack "local var = v1 or v2" (adj.lua x3)
+- acertar __ast_blk (estou apontando pro filho em vez do proprio)
+- Remover todos os Ref:
+    - me.__ast_remove
+        - no visit:
+            me.__ast_remove = nil
+            me[i] = node(nothing)
+- spawn async => spawn/async
+
+All kinds of events have "tuple types":
+
+    input void      A;
+    input int       B;
+    input (int,int) C;
+
+is a sugar for
+
+    input ()        A;
+    input (int)     B;
+    input (int,int) C;
+
+and
+
+    emit A;
+    emit B => 1;
+    emit C => (1,1);
+
+is a sugar for
+
+    emit A => ();
+    emit B => (1);
+    emit C => (1,1);
+
+When interfacing with C, tuple types are converted to structs:
+
+    void            A;      // "void" if the event carries no values
+    tceu__int       B;
+    tceu__int__int  C;
+
+with each tuple item converted to a struct field:
+
+    // "A" events
+    // no corresponding struct
+
+    // struct for "B" events
+    typedef struct {
+        int _1;
+    } tceu__int;
+
+    // struct for "C" events
+    typedef struct {
+        int _1;
+        int _2;
+    } tceu__int__int;
+
+When emitting an input event, a C binding has to pass a pointer to the 
+corresponding struct variable carrying the actual event values:
+
+    // "A" events
+    ceu_sys_go(&app, CEU_IN_A, NULL);
+
+    // "B" events
+    tceu__int evtp = { <event-int-value> };
+    ceu_sys_go(&app, CEU_IN_B, &evtp);
+
+    // "C" events
+    tceu__int__int evtp = { <event-int-value-1>, <event-int-value-2> };
+    ceu_sys_go(&app, CEU_IN_B, &evtp);
+
+For event tuples with a single value, the struct can be avoided with another 
+level of indirection to the actual value:
+
+    // "B" events
+    int* evtp = &<event-int-value>;
+    ceu_sys_go(&app, CEU_IN_B, &evtp);
+
+The wall-clock event is an exception and does not require two levels of 
+indirection:
+
+    // "WCLOCK" event
+    s32 dt = <...>
+    ceu_out_go(APP, CEU_IN__WCLOCK, &dt);

@@ -1,0 +1,87 @@
+NEXTS:
+=> iterators
+
+===============================================================================
+
+// ARRAYS
+
+- size + [buf] + '\0'       // no caso de char
+- [buf] eh a base p/ interoperabilidade com C
+- may have holes
+    - how to deal in iterators
+    - what is the semantics of #v
+
+##v         // max (0=unbounded)
+#v          // cur
+v[i]        // ?t
+[a,b,c]     // constructor
+
+var int[_]  v = [1,2,3];    // calculates ## from "Hello"
+
+v = v .. [4,5];             // concatenation to "v"
+f(v .. [3,4]);              // NO, no destination
+
+v = v .. 1 .. v[1];         // concatenation accepts values
+v = v .. [1] .. [ v[1] ];   // concatenation accepts arrays
+
+v = u;                      // copy
+
+#v = K;         // fails for K>#v (unless vector of Opts)
+v[#v+1] = x;    // grows (not required with concats above)
+v = v - N;
+v[i] = x;       // fails if i>#v
+
+// STRINGS
+
+- TODO:
+    - slices are probably required
+        - how to pass a substring safely?
+
+- especial por que nao pode ter buracos
+    - garantir que para
+        s[k]=?  , k<=#s
+    - nunca retorna "char?"
+    - nao precisa armazenar indices setados
+        - apenas #s e ##s mesmo
+
+    - fazer o mesmo para os outros tipos de array???
+        - acho uma boa
+        - mas e arrays esparsos?
+        - claro, distinguir na declaracao!!!
+        - var int?[]
+
+
+// var u8[] in Rust
+
+var char[_]  s = "Hello";   // calculates from "Hello"
+var char[]   s = "Hello";   // unbounded
+var char[10] s = "Hello";   // bounded
+
+s = s .. " World!";         // concatenation to "s"
+f(s .. "no");               // NO, no destination
+
+s = s .. 'a' .. t[1];       // concatenation accepts values
+s = s .. ['a'] .. [t[1]];   // concatenation accepts arrays
+
+s = t;                      // copy
+
+// HASHES
+
+// POOLS
+
+- never has holes
+    - how to deal in iterators
+    - what is the semantics of #v
+
+var T[_]  ts;               // NO
+var T[]   ts = ...;         // NO
+var T[]   ts;
+var T[10] ts;
+
+##ts        // ok
+#ts         // ?    O(n)
+ts[i]       // ?    O(n)
+[a,b,c]     // NO
+..          // NO
+ts = us     // NO
+

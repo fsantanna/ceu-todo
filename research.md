@@ -1,0 +1,67 @@
+        --[[
+        -- TODO-RESEARCH-1:
+        -- If an "emit" is on the stack and its enclosing block "self-aborts",
+        -- we need to remove the "emit" from the stack because its associated
+        -- payload may have gone out of scope:
+        --
+        --  par/or do
+        --      par/or do
+        --          var int x;
+        --          emit e => &x;
+        --      with
+        --          await e;    // aborts "emit" block w/ "x"
+        --      end
+        --  with
+        --      px = await e;
+        --      *px;            // "x" is out of scope
+        --  end
+        --
+        -- To remove, we need to "finalize" the "emit" removing itself from the
+        -- stack:
+
+        --  emit x;
+        --      ... becomes ...
+        --  do
+        --      var int fin = stack_nxti() + sizeof(tceu_stk);
+        --                      /* TODO: two levels up */
+        --      finalize with
+        --          if (fin != CEU_STACK_MAX) then
+        --              stack_get(fin)->evt = IN_NONE;
+        --          end
+        --      end
+        --      emit x;
+        --      fin = CEU_STACK_MAX;
+        --  end
+        --
+        -- Alternatives:
+        --      - forbid pointers in payloads: we could then allow an "emit" to
+        --        stay in the stack even if its surrounding block aborts
+        --      - statically detect if an "emit" can be aborted
+        --          - generate a warning ("slow code") and the code above if it
+        --            is the case
+        --
+        -- TODO: this may have solved the problem with await/awake in the same reaction
+        --]]
+        --[[
+        -- TODO-RESEARCH-2:
+        -- When an organism dies naturally, some pending traversals might
+        -- remain in the stack with dangling pointers to the released organism:
+        --
+        --  class T with
+        --  do
+        --      par/or do
+        --          // aborts and terminates the organism
+        --      with
+        --          // continuation is cleared but still has to be traversed
+        --      end
+        --  end
+        --
+        -- The "stack_clear_org" modifies all pending traversals to the
+        -- organism to go in sequence.
+        --
+        -- Alternatives:
+        --      - TODO: currently not organism in sequence, but restart from Main
+        --          (#if 0/1 above and in ceu_stack_clear_org)
+        --      - ?
+        --]]
+
