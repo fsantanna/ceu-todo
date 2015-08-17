@@ -1,5 +1,9 @@
+# R0: re-awake check
+
+# R1: emit self-abortion w/ pointers
         --[[
         -- TODO-RESEARCH-1:
+resolvido com proibicao de ponteiros
         -- If an "emit" is on the stack and its enclosing block "self-aborts",
         -- we need to remove the "emit" from the stack because its associated
         -- payload may have gone out of scope:
@@ -42,6 +46,8 @@
         --
         -- TODO: this may have solved the problem with await/awake in the same reaction
         --]]
+
+# R2: Org termination
         --[[
         -- TODO-RESEARCH-2:
         -- When an organism dies naturally, some pending traversals might
@@ -65,3 +71,42 @@
         --      - ?
         --]]
 
+# R3: IDs para classes
+
+    u32 id;
+        /* TODO: couldn't find a way to use the address as an identifier
+         * when killing an organism. The "free" happens before the "kill"
+         * completes and the address can be reused in the meantime.
+         * It could happen that an await on a newly created organism awakes
+         * from the previous "kill".
+         * Couldn't reproduce on "tests.lua", but "turtle.ceu" does.
+         */
+# R4: mutation during pool iteration
+    - solution #1: wacthing + runtime support (it_enter/leave/kill)
+    - solution #2: forbig emit/await/spawn/etc
+
+# R5: emit mais externo vence
+    - acho que é o que quero mesmo
+        - broadcast é broadcast
+        - 2-pass acontece isso
+        - 1-pass menor vence
+
+    par/or do
+        ...
+        emit e => 1;
+    with
+        await e;
+        emit e => 2;
+    with
+        var int v = await e;
+        escape v;   // 1
+    end
+
+# R6: ceu_sys_stack_clear_org
+    - Quando um org morre, toda a pilha deve ser atravessada:
+        - todos os orgs sendo atravessados que forem filhos do org que morreu, 
+          devem ser reapontados para o org seguinte ao que morreu.
+
+# R7: mutation of root/alias
+    Set_pos = '__await',    -- 'adt-mut'
+        also for pool references? (& and &&?)

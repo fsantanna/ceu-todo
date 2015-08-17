@@ -1,21 +1,40 @@
+STACK[0]: evt=246 : seqno=2
+        org=0x7fffadfa8c60/1 : [11/0x7fffadfa8c90]
+        TRY[0x7fffadfa8ce0] : evt=251 : seqno=0 : stk=0 : lbl=13
+        >>> NO
+
+
 - New scheduler
-    - guardar time do original
-    + checar se Rocks,Tic-Tac,UI*,Curry-All,STL-All,Turtle estao OK
-    - proibir emit=>ptr&&, permitir emit=>org&&?
-        - acho que tem que proibir ambos
-    - checar se Rocks,Tic-Tac,UI*,Curry-All,STL-All,Turtle usam emit=>ptr&&
+    + guardar time do original
+    + checar se Rocks/TM,Tic-Tac,UI*,Curry-All,STL-All,Turtle estao OK
+    + proibir emit=>ptr&&, permitir emit=>org&&?
+        + acho que tem que proibir ambos
+    + checar se Rocks/TM,Tic-Tac,UI*,Curry-All,STL-All,Turtle usam emit=>ptr&&
+    + remove fin p/emits (ainda em ops)
+        + alguns exemplos podem quebrar (sem mudou!)
+    + tirar emit/await de dentro de pool iterator
+        + reescrever exemplos usando vetor T&&?[]
+    + testar Rocks/TM,Tic-Tac,UI*,Curry-All,STL-All,Turtle
+        - nem todos
+
     - two-pass scheduler
         - resolve RESEARCH-2
+            - stack_clear_org
         - elimina IDs de orgs, se ok_killed já testar o ponteiro no momento da 
           1a passada
     - rodar time do novo scheduler
-    - checar se Rocks,Tic-Tac,UI*,Curry-All,STL-All,Turtle usam emit=>ptr&&
+    - testar Rocks/TM,Tic-Tac,UI*,Curry-All,STL-All,Turtle
 
 - ok_kill ser especial e carregar na trail o org/adt a ser testado
     - 1 passada para marcar como acrodado, outra para então executar
     - isso não pode ser aplicado de maneira geral?
     - não vai solucionar outros problemas?
     - voltar com aquela ideia de duas passadas para geral...
+
+- muitos testes que agora dao erro com a mensagem abaixo,
+    - podem nao ter substitutos funcionais à altura
+    - talvez ajustar esses exemplos para funcionar
+    env = 'line 16 : wrong argument : cannot pass pointers',
 
 - make free after kill
     /* TODO: BUG: id should be saved together with the pointer */
