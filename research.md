@@ -1,6 +1,6 @@
-# R0: re-awake check
+# R-0: re-awake check
 
-# R1: emit self-abortion w/ pointers
+# R-1: emit self-abortion w/ pointers
         --[[
         -- TODO-RESEARCH-1:
 resolvido com proibicao de ponteiros
@@ -47,7 +47,7 @@ resolvido com proibicao de ponteiros
         -- TODO: this may have solved the problem with await/awake in the same reaction
         --]]
 
-# R2: Org termination
+# R-2: Org termination
         --[[
         -- TODO-RESEARCH-2:
         -- When an organism dies naturally, some pending traversals might
@@ -71,7 +71,7 @@ resolvido com proibicao de ponteiros
         --      - ?
         --]]
 
-# R3: IDs para classes
+# R-3: IDs para classes
 
     u32 id;
         /* TODO: couldn't find a way to use the address as an identifier
@@ -81,11 +81,11 @@ resolvido com proibicao de ponteiros
          * from the previous "kill".
          * Couldn't reproduce on "tests.lua", but "turtle.ceu" does.
          */
-# R4: mutation during pool iteration
+# R-4: mutation during pool iteration
     - solution #1: wacthing + runtime support (it_enter/leave/kill)
     - solution #2: forbig emit/await/spawn/etc
 
-# R5: emit mais externo vence
+# R-5: emit mais externo vence
     - acho que é o que quero mesmo
         - broadcast é broadcast
         - 2-pass acontece isso
@@ -102,11 +102,28 @@ resolvido com proibicao de ponteiros
         escape v;   // 1
     end
 
-# R6: ceu_sys_stack_clear_org
+# R-6: ceu_sys_stack_clear_org
     - Quando um org morre, toda a pilha deve ser atravessada:
         - todos os orgs sendo atravessados que forem filhos do org que morreu, 
           devem ser reapontados para o org seguinte ao que morreu.
+    - ANA_NO_NESTED_TERMINATION
 
-# R7: mutation of root/alias
+# R-7: mutation of root/alias
     Set_pos = '__await',    -- 'adt-mut'
         also for pool references? (& and &&?)
+
+# R-8: org immediate termination
+    - interaction with spawn and await
+    - SOLUTION: tagged union: [NULL,ALIVE,RET]
+        data T with
+            tag FAIL;
+        or
+            tag ALIVE;
+        or
+            tag TERMINATED with
+                var int v;
+            end
+        end
+
+# R-9: size of trails for internal events double the size of all trails
+    - ok_killed and orgs are also expense

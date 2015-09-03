@@ -1,8 +1,21 @@
-STACK[0]: evt=246 : seqno=2
-        org=0x7fffadfa8c60/1 : [11/0x7fffadfa8c90]
-        TRY[0x7fffadfa8ce0] : evt=251 : seqno=0 : stk=0 : lbl=13
-        >>> NO
+(*) ceu_out_log, ceu_out_assert
+native/pre => native/global
+(-) global
 
+--[[
+tag conversion values
+this.pingu = &this.pingu in constructors
+var bool has_changed = (this.current_pingu != cur);
+bug $$items
+returning &&? from function
+retorno de funcao requer finalize? (playfield.ceu)
+pools dentro de funcoes
+]]
+
+- precedence of &/|
+- force all assignments (make ref.lua work for all types besides &)
+
+- BUG: acho que nao esta executando p/ codigo estatico p/ clear_orf
 
 - New scheduler
     + guardar time do original
@@ -16,14 +29,14 @@ STACK[0]: evt=246 : seqno=2
         + reescrever exemplos usando vetor T&&?[]
     + testar Rocks/TM,Tic-Tac,UI*,Curry-All,STL-All,Turtle
         - nem todos
-
-    - two-pass scheduler
+    + two-pass scheduler
         - resolve RESEARCH-2
             - stack_clear_org
-        - elimina IDs de orgs, se ok_killed já testar o ponteiro no momento da 
+        + elimina IDs de orgs, se ok_killed já testar o ponteiro no momento da 
           1a passada
-    - rodar time do novo scheduler
-    - testar Rocks/TM,Tic-Tac,UI*,Curry-All,STL-All,Turtle
+    + rodar time do novo scheduler
+    + testar SDL: UI*,Tic-Tac,Rocks/TM/Test,Curry-All,STL-All,Turtle/REBLS
+    - testar Arduino, TinyOS
 
 - ok_kill ser especial e carregar na trail o org/adt a ser testado
     - 1 passada para marcar como acrodado, outra para então executar
