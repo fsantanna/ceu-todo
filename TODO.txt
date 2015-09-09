@@ -1,6 +1,13 @@
-(*) ceu_out_log, ceu_out_assert
-native/pre => native/global
-(-) global
+   3460	     22	    201	   3683	    e63	poll.elf
+   3440	     22	    201	   3663	    e4f	poll.elf
+   2786	     22	    199	   3007	    bbf	poll.elf
+   2852	     22	    200	   3074	    c02	poll.elf
+   2430	     22	    196	   2648	    a58	poll.elf
+   2430	     22	    194	   2646	    a56	poll.elf
+
+
+- arduino _ret0
+- arduino type-punned pointer
 
 --[[
 tag conversion values
@@ -12,10 +19,9 @@ retorno de funcao requer finalize? (playfield.ceu)
 pools dentro de funcoes
 ]]
 
-- precedence of &/|
 - force all assignments (make ref.lua work for all types besides &)
 
-- BUG: acho que nao esta executando p/ codigo estatico p/ clear_orf
+- BUG: acho que nao esta executando p/ codigo estatico p/ clear_org
 
 - New scheduler
     + guardar time do original
@@ -36,7 +42,7 @@ pools dentro de funcoes
           1a passada
     + rodar time do novo scheduler
     + testar SDL: UI*,Tic-Tac,Rocks/TM/Test,Curry-All,STL-All,Turtle/REBLS
-    - testar Arduino, TinyOS
+    - testar Arduino, TinyOS, run_tests_os.lua, mqueue, RPI
 
 - ok_kill ser especial e carregar na trail o org/adt a ser testado
     - 1 passada para marcar como acrodado, outra para então executar
