@@ -1,0 +1,14 @@
+- COOL PROJECTS
+    - use emscripten to run ceu-sdl/samples on the Web
+    - re-implement 7 guis (requires a C-based toolkit: IUP/GTK)
+    - Logo/Ceu interpreter
+    - GUI tree
+    - OS permissions for I/O and syscalls
+    - pool de threads async/thread (a,b,c) in XXX;
+    - gerador de programas para pegar bugs no compilador
+    - Debugger a la Sean
+    - Visual editor
+    - OS
+    - Handmade Hero
+    - nanomsg / OS
+    - command-line DSL in LPeg

@@ -1,0 +1,53 @@
+FREECIV            373485
+Aquaria            313101       C/C++
+WESNOTH            297962
+ASC                229123
+Open Clonk         225096       C/C++
+OPENTTD            210123
+FREEORION          172000       C++
+0AD                150000       C++
+SIMUTRANS          130289
+WIDELANDS          130000       C++/SDL
+SuperTuxKart       115000       C++
+Hardwar            114949       C/C++
+HEROES              86887 / 73008
+BOSWARS             93058
+MAXR                91230
+DUNE                70213
+FREEDROID           65000       C/SDL
+TEEWORLD            64265       C++
+ALLACROST           62841       C++/SDL
+Dawn RPG            61314       C++
+SMC (mario)         59167
+MINETEST            55000       C++
+CAVE                53076       c++
+SOLARUS             51439
+PINGUS              40000       C++/SDL
+Open Sonic          42984       C
+OpenDune            38200
+SPACEZERO           28357
+Gish                28132       C
+SUPERTUX            25768
+Maze of Galious     23583       C++
+Chromium            22624       C++
+SuperTux-0.13       18339       C++
+GameLV              11671       C++
+TETRIS               7544
+
+- War
+    - ranking
+    - vector-based map
+        - zoom
+        - upload/download
+- Super Sprint
+    - gestos p/ controlar o carro
+- The game of horse. One player creates the gesture, the second player must match it.
+
+
+KeeperRL            25726       C++/SFML
+git clone https://github.com/miki151/keeperrl.git
+
+git clone git://gitorious.org/crawl/crawl.git
+
+- CIV
+    - Taxa de crescimento do país: agricultor, produtor, cientista, militar

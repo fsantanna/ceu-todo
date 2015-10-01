@@ -1,13 +1,5 @@
-   3460	     22	    201	   3683	    e63	poll.elf
-   3440	     22	    201	   3663	    e4f	poll.elf
-   2786	     22	    199	   3007	    bbf	poll.elf
-   2852	     22	    200	   3074	    c02	poll.elf
-   2430	     22	    196	   2648	    a58	poll.elf
-   2430	     22	    194	   2646	    a56	poll.elf
-
-
-- arduino _ret0
-- arduino type-punned pointer
+- em vez de STACK, fazer chamadas recursivas a bcast/dispatch
+/* TODO: #ifdef CEU_INTS: seqno, stk_curi, CEU_STK */
 
 --[[
 tag conversion values
@@ -43,6 +35,8 @@ pools dentro de funcoes
     + rodar time do novo scheduler
     + testar SDL: UI*,Tic-Tac,Rocks/TM/Test,Curry-All,STL-All,Turtle/REBLS
     - testar Arduino, TinyOS, run_tests_os.lua, mqueue, RPI
+    - testar CiB
+    - Site
 
 - ok_kill ser especial e carregar na trail o org/adt a ser testado
     - 1 passada para marcar como acrodado, outra para então executar
@@ -138,19 +132,6 @@ pools dentro de funcoes
 - await-ORG, await-ADT e recurse são await/0
     - proibir emit-o sem watching
     - proibir kill dentro de finalize
-
-- COOL PROJECTS
-    - use emscripten to run ceu-sdl/samples on the Web
-    - re-implement 7 guis (requires a C-based toolkit: IUP/GTK)
-    - Logo/Ceu interpreter
-    - GUI tree
-    - OS permissions for I/O and syscalls
-    - pool de threads async/thread (a,b,c) in XXX;
-    - gerador de programas para pegar bugs no compilador
-    - Debugger
-    - Visual editor
-    - OS
-    - Handmade Hero
 
 - INEFFICIENCIES
     - related to "kill"
