@@ -126,4 +126,4 @@ resolvido com proibicao de ponteiros
         end
 
 # R-9: size of trails for internal events double the size of all trails
-    - ok_killed and orgs are also expense
+    - ok_killed and orgs are also expensive

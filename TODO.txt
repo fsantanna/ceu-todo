@@ -1,5 +1,38 @@
-- em vez de STACK, fazer chamadas recursivas a bcast/dispatch
-/* TODO: #ifdef CEU_INTS: seqno, stk_curi, CEU_STK */
+- remove /* TCEU_RECURSE */
+- percorrer stk na ordem natural!
+- todos os signal killed precisam de setjmp
+-- TODO: Unfortunately, allocation needs to happen before "free".
+-- TODO: choose between the two
+-- TODO: precisa teste de clear? e o outro?
+- ORGS/ADTS
+    - morte de org/adt nao deveria gerar ok_killed para filhos,
+    - em compensacao, await org/adt tb deve acordar qdo pais morrem
+    - org: atualmente gera ok_killed
+    - adt: nao gera, mas acho que filhos nao acordam com morte do pai
+    - trail de finalize p/ adts sem malloc se tornam desnecessarios
+
+- minimizar tceu_stk, unificar com call
+- tirar tceu_recurse, __loop, iter_max
+- natural termination, longjmp pode passar valor de retorno!
+- remover CEU_JMP_* ?
+    - usar propria stack?
+- setjmp/longjmp
+    - gerar somente setjmp necessarios
+        - par
+            - trilhas sem yield
+                - se par/or, trilhas sem termino
+        - emit
+            - cujo awaits nao terminam blocos englobando emit
+    - vai resolver emit=>ptr ?
+
+- kill-adt has no access to the stack
+    - also kill doesnt check return
+- BUG-EVERY-SPAWN
+- minimizar tceu_trl
+- remover trl->org_or_adt, colocar teste no codigo novamente ja que nao vou 
+  mais usar broadcast
+
+====================
 
 --[[
 tag conversion values
