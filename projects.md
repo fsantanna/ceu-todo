@@ -1,4 +1,6 @@
 - COOL PROJECTS
+    - kore webserver integration
+    - libmill webserver integration
     - use emscripten to run ceu-sdl/samples on the Web
     - re-implement 7 guis (requires a C-based toolkit: IUP/GTK)
     - Logo/Ceu interpreter

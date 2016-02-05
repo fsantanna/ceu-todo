@@ -1,6 +1,72 @@
-- remove /* TCEU_RECURSE */
-- percorrer stk na ordem natural!
-- todos os signal killed precisam de setjmp
+=== Constructors
+
+var RectComponent component = RectComponent.build(&outer.rect);
+var RectComponent component = RectComponent.build(&THIS.rect);
+
+=== Ignore error in requests:
+
+(err,v) = request X;
+v = request X;          // asserts that err==0
+
+var _: Sprite = Sprite.xxx(...);
+spawn Sprite.xxx(...) in ss;
+
+=== initialization for vector impossible
+data Test with
+  var u8 n;
+  var _u8[10] v;
+end
+
+=== constructor for data?
+data Test with
+    var u8 n;
+end
+var Test t with
+    this.n = 3;
+end;
+_printf("%d\n", t.n);
+escape 42;
+
+- rocks, usar vetor global, orgs interessados devem se inserir a cada frame
+- testar reentrant
+- nao gerar CEU_STACK_CLEAR em varios casos
+- remover necessidade do bottom fixed stack frame
+
+- val: immutable var
+    - val for orgs, no writes/SE-calls,emits, only reads/awaits?
+- single framework for
+    - tight loops
+    - reachability
+    - initialization of variables
+
+-- TODO: check on concat if previous is clear, and override it with outer
+
+== enclose/escape
+
+v = enclose do
+        escape 1;
+    end
+
+enclose do
+    escape;
+end
+
+== constr
+
+var T t.constr(...);
+spawn T.constr(...) in T;
+
+== finalize
+
+a = x
+    finalize with
+        ...
+    end
+
+====================
+= Novo scheduler
+
+- longjmp on halt only
 -- TODO: Unfortunately, allocation needs to happen before "free".
 -- TODO: choose between the two
 -- TODO: precisa teste de clear? e o outro?
@@ -10,10 +76,9 @@
     - org: atualmente gera ok_killed
     - adt: nao gera, mas acho que filhos nao acordam com morte do pai
     - trail de finalize p/ adts sem malloc se tornam desnecessarios
-
 - minimizar tceu_stk, unificar com call
 - tirar tceu_recurse, __loop, iter_max
-- natural termination, longjmp pode passar valor de retorno!
+- timemachine, bloco de emit esta morrendo antes de acordar await necessario
 - remover CEU_JMP_* ?
     - usar propria stack?
 - setjmp/longjmp
@@ -24,13 +89,11 @@
         - emit
             - cujo awaits nao terminam blocos englobando emit
     - vai resolver emit=>ptr ?
-
-- kill-adt has no access to the stack
-    - also kill doesnt check return
 - BUG-EVERY-SPAWN
 - minimizar tceu_trl
 - remover trl->org_or_adt, colocar teste no codigo novamente ja que nao vou 
   mais usar broadcast
+/* TODO: now all arguments are required in all configurations */
 
 ====================
 
@@ -43,8 +106,6 @@ returning &&? from function
 retorno de funcao requer finalize? (playfield.ceu)
 pools dentro de funcoes
 ]]
-
-- force all assignments (make ref.lua work for all types besides &)
 
 - BUG: acho que nao esta executando p/ codigo estatico p/ clear_org
 

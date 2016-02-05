@@ -127,3 +127,50 @@ resolvido com proibicao de ponteiros
 
 # R-9: size of trails for internal events double the size of all trails
     - ok_killed and orgs are also expensive
+
+# setjmp & longjmp
+
+We use C calls to start organisms and trails in parallel, awake events, and so 
+on.
+These calls execute code that might also make new calls, generating a call 
+stack during runtime.
+In normal situations, after the call completes, the execution resumes to the 
+statement following it.
+However, due to abortion, some calls in the stack should not resume because its 
+body is no longer alive in the program.
+For this reason, we use `setjmp` and `longjmp` in the implementation.
+
+Each call that can possibly result in self abortion needs a preceding `setjmp` 
+to prepare the stack level to receive a `longjmp`.
+
+The calls are
+    - spawning a new org:
+        - the new org might emit a global event that awakes a par/or enclosing 
+          the call point
+    - killing an org:
+        - the kill might awake a par/or enclosing the call point
+    - mutating an adt:
+        - the mutation frees a subtree that might awake a par/or enclosing the 
+          call point
+    - starting trails in a par:
+        - the 1st trail might abort an enclosing par/or, or emit something that 
+          does.
+    - emit internal event:
+        - the emit might awake a par/or enclosing the call point
+    - emit external input event:
+        - the emit might awake a par/or enclosing the call point
+    - traversing children:
+        - a child might emit a global event that awakes a par/or enclosing the 
+          parent organism with the call point.
+
+The stack level has to hold the current organism and range of trails which the 
+call encloses.
+
+Conversely, each abortion point checks the stack to perform the `longjmp`.
+The stack is travesed from bottom up to abort the outermost call, making all 
+calls above it to never resume.
+
+The `longjmp` sets its continuation in globals so that the resumed call can 
+proceed to it, also
+
+with the continuation

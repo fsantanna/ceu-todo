@@ -4,6 +4,8 @@ WESNOTH            297962
 ASC                229123
 Open Clonk         225096       C/C++
 OPENTTD            210123
+Ryzom              190000       C++
+ManaPlus           185000       C++
 FREEORION          172000       C++
 0AD                150000       C++
 SIMUTRANS          130289
